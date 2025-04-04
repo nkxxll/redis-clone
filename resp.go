@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"log/slog"
 	"strconv"
 )
 
@@ -39,10 +40,12 @@ func NewWriter(w io.Writer) Writer {
 
 func (w *Writer) Write(v Value) error {
 	bytes := v.Marshal()
+	slog.Info(fmt.Sprintf("response bytes: %s", string(bytes)))
 	_, err := w.writer.Write(bytes)
 	if err != nil {
 		return err
 	}
+	w.writer.Flush()
 	return nil
 }
 

@@ -12,11 +12,13 @@ var Handlers = map[string]func([]Value) Value{
 	"DOCS":    docs,
 }
 
-var SETs = map[string]string{}
-var SETsMu = sync.RWMutex{}
+var (
+	SETs   = map[string]string{}
+	SETsMu = sync.RWMutex{}
 
-var HSETs = map[string]map[string]string{}
-var HSETsMu = sync.RWMutex{}
+	HSETs   = map[string]map[string]string{}
+	HSETsMu = sync.RWMutex{}
+)
 
 func hget(args []Value) Value {
 	if len(args) != 2 {
