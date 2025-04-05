@@ -8,6 +8,7 @@ var Handlers = map[string]func([]Value) Value{
 	"GET":     get,
 	"HSET":    hset,
 	"HGET":    hget,
+	"HGETALL": hgetall,
 	"COMMAND": command,
 	"DOCS":    docs,
 }
@@ -19,6 +20,29 @@ var (
 	HSETs   = map[string]map[string]string{}
 	HSETsMu = sync.RWMutex{}
 )
+
+func hgetall(args []Value) Value {
+	if len(args) != 1 {
+		return Value{typ: "error", str: "ERR wrong number of arguments for 'hgetall' command"}
+	}
+
+	hash := args[0].bulk
+
+	HSETsMu.RLock()
+	valMap, ok := HSETs[hash]
+	HSETsMu.RUnlock()
+
+	if !ok {
+		return Value{typ: "null"}
+	}
+
+	var values []Value
+	for _, v := range valMap {
+		values = append(values, Value{typ: "bulk", bulk: v})
+	}
+
+	return Value{typ: "array", array: values}
+}
 
 func hget(args []Value) Value {
 	if len(args) != 2 {
@@ -63,11 +87,11 @@ func ping(vs []Value) Value {
 }
 
 func docs(args []Value) Value {
-	return Value{}
+	return Value{typ: "string", str: "Docs!"}
 }
 
 func command(args []Value) Value {
-	return Value{}
+	return Value{typ: "string", str: "Command!"}
 }
 
 func set(args []Value) Value {
